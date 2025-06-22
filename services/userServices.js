@@ -14,9 +14,10 @@ class UserService{
           return existingUser;
     }
 
-    static async createUser(name,email,password){
-        const hashedPassword = await bcrypt.hash(password,10);
-        return User.create({name,email,password:hashedPassword});    }
+    static async createUser(name, email, password, image = null) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        return User.create({ name, email, password: hashedPassword, image });
+    }
 
  static  async validateUserPassword(user,password){
     if(!user){

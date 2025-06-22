@@ -5,13 +5,23 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
 const Joi = require('joi');
-const UserService = require("../services/userServices")
-
+const UserService = require("../services/userServices");
+const session = require("express-session");
 // Safeguard for User model
 if (!User) {
   console.error('User model is not defined. Check models/index.js.');
   throw new Error('User model is not defined.');
 }
+
+// app.use(session({
+//   secret:'secretkeyhere',
+//   resave:false,//check the we we don,t modify the sessions later
+//   saveUninitialized:false,
+//   cookie:{maxAge: 1000 * 60 * 60}
+// }))  
+
+
+
 
 const signup = async (req, res) => {
   try {
@@ -30,6 +40,7 @@ const signup = async (req, res) => {
         // Use the last error for each field to avoid duplicates
         errors[field] = detail.message;
       });
+
       return res.status(400).json({
         message: 'Validation failed',
         errors,
@@ -44,18 +55,26 @@ const signup = async (req, res) => {
       return res.status(409).json({ message: 'This email is already registered.' });
     }
 
-    // Create user
-    const user = await UserService.createUser(name,email,password);
+    // Handle image upload
+    let image = null;
+    if (req.file) {
+      image = req.file.filename;
+    }
 
-res.status(201).json({
-  message: 'User registered successfully',
-  user: {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    createdAt: user.createdAt,
-  },
-})
+    // Create user with image
+    const user = await UserService.createUser(name, email, password);
+
+    
+
+    res.status(201).json({
+      message: 'User registered successfully',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
+      },
+    });
 
 
     // Generate JWT
@@ -115,7 +134,7 @@ const login = async (req, res) => {
 
     // Check if user exists
     if (!user) {
-      return res.status(404).json({ message: 'No account found' });
+      return res.status(404).json({ message: 'Invalid Credentials' });
     }
 
 console.log(user,password)

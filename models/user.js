@@ -50,10 +50,16 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
+      // // Define the 'googleId' attribute for Google OAuth users
+      // googleId: {
+      //   type: DataTypes.STRING,
+      //   allowNull: true,
+      //   unique: true,
+      // },
       // Define the 'password' attribute with string data type, constraints, and validation rules
       password: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true, // Now nullable for Google users
         validate: {
           len: {
             args: [8, 255],
@@ -61,6 +67,17 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
+      // Add the 'image' attribute for storing user image filename or path
+      // image: {
+      //   type: DataTypes.STRING(2000),
+      //   allowNull: true,
+      //   validate: {
+      //     max: {
+      //       args: 2000,
+      //       msg: 'Image filename cannot exceed 2000 characters.',
+      //     },
+      //   },
+      // },
     },
     {
       sequelize, // Pass the Sequelize instance to bind the model to the database connection
