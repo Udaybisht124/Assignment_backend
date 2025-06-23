@@ -48,6 +48,7 @@ const signup = async (req, res) => {
     }
 
     const { name, email, password } = req.body;
+    console.log(name,email,password)
 
     // Check if email exists
     const existingUser = await UserService.findUserByEmail(email);
