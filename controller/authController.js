@@ -1,6 +1,7 @@
 'use strict';
 const { User } = require('../models');
 const userValidationSchema = require('../validator/userValidator');
+const sendWelcomeEmail = require('../services/emailServices')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
@@ -48,7 +49,7 @@ const signup = async (req, res) => {
     }
 
     const { name, email, password } = req.body;
-    console.log(name,email,password)
+
 
     // Check if email exists
     const existingUser = await UserService.findUserByEmail(email);
@@ -64,8 +65,18 @@ const signup = async (req, res) => {
 
     // Create user with image
     const user = await UserService.createUser(name, email, password);
-
-    
+if(user){
+  sendWelcomeEmail(name,email).then((sent)=>{
+if(sent){
+console.log(`Email Send Successfully to ${name}`);
+}
+else{
+  console.log(`Error in sending the Email to ${name} user`);
+}
+  }).catch((error)=>{
+    console.log('Error in sending the Email to User');
+  }) 
+}
 
     res.status(201).json({
       message: 'User registered successfully',
